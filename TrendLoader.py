@@ -123,14 +123,14 @@ def create_upper_bound(SMA, Vol):
 
 
 
-def draw_graph(SMA, EMA, lower_bound, dates_x_axis, upper_bound, ticker):
+def draw_graph(SMA, EMA, lower_bound, dates, upper_bound, ticker):
 
 
     plot.figure(figsize=(12, 6))
-    plot.plot(dates_x_axis, SMA, label='SMA', linestyle = '-', linewidth = 2)
-    plot.plot(dates_x_axis, EMA, label='EMA', linestyle = '-', linewidth = 2)
-    plot.plot(dates_x_axis, lower_bound, label='Lower Bound', linestyle = '-', linewidth = 0.5, color= "Green")
-    plot.plot(dates_x_axis, upper_bound, label='Upper Bound', linestyle='-', linewidth= 0.5, color= "Green")
+    plot.plot(dates, SMA, label='SMA', linestyle ='-', linewidth = 2)
+    plot.plot(dates, EMA, label='EMA', linestyle ='-', linewidth = 2)
+    plot.plot(dates, lower_bound, label='Lower Bound', linestyle ='-', linewidth = 0.5, color="Green")
+    plot.plot(dates, upper_bound, label='Upper Bound', linestyle='-', linewidth= 0.5, color="Green")
 
     plot.xlabel("Months")
     plot.ylabel("Prices")
@@ -139,45 +139,44 @@ def draw_graph(SMA, EMA, lower_bound, dates_x_axis, upper_bound, ticker):
     plot.legend()
     plot.show()
 
-
-
-
 def main():
-    ticker = input("Enter the Ticker for a stock (Ex. AAPL, TESLA, AMZN) for an analysis of its medium-term trend:")
+    # 1. Prompt the user for a ticker symbol and normalize it
+    ticker = input(
+        "Enter the Ticker for a stock (Ex. AAPL, TESLA, AMZN) for an analysis of its medium-term trend:"
+    ).strip().upper()
 
-    date_today = pd.to_datetime("today").normalize()
-
+    # 2. Build the date range: from one year ago up to today
+    date_today    = pd.to_datetime("today").normalize()
     date_year_ago = date_today - pd.DateOffset(years=1)
+    start = date_year_ago.strftime("%Y-%m-%d")
+    end   = date_today.strftime("%Y-%m-%d")
 
+    # 3. Download historical price data (adjusted for splits/dividends by default)
+    df = fin.download(ticker, start=start, end=end, progress=False)
+    if df.empty:
+        # If no rows came back, inform the user and exit
+        print(f"No data returned for {ticker}. Please check the symbol or your connection.")
+        return
 
-    date_today = date_today.strftime("%Y-%m-%d")
+    # 4. Extract closing prices and their corresponding dates
 
-    date_year_ago = date_year_ago.strftime("%Y-%m-%d")
+    closing_list = df.iloc[:, 0].tolist()
+    dates = df.index
 
-
-    dates_x_axis = pd.bdate_range(start=date_year_ago, end=date_today)
-
-    price_list = fin.download(ticker, start=date_year_ago, end=date_today)
-    adj_x_axis = dates_x_axis[dates_x_axis.isin(price_list.index)]
-
-    first_closing_list = price_list["Close"]
-
-
-    closing_list = first_closing_list[adj_x_axis]
-
-    closing_list = closing_list.tolist()
-
+    # 5. Compute the moving averages and volatility
     EMA = ExponentialMA(closing_list)
     SMA = simpleMA(closing_list)
-    Vol = Volatility(closing_list)
-    Vol = Vol * 2
-    """2 standard deviations on the volatility is a fairly common implementation"""
+    Vol = Volatility(closing_list) * 2    # annualized volatility × 2 for 2σ bands
+
+    # 6. Build the upper and lower volatility bands around the SMA
     lower_bound = create_lower_bound(SMA, Vol)
     upper_bound = create_upper_bound(SMA, Vol)
 
-
+    # 7. Analyze the current trend and render the chart
     find_trend(SMA, EMA, Vol, ticker)
-    draw_graph(SMA, EMA, lower_bound, adj_x_axis, upper_bound, ticker)
+    draw_graph(SMA, EMA, lower_bound, dates, upper_bound, ticker)
+
+
 
 
 
