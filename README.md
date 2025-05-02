@@ -17,10 +17,9 @@ price-action may be in consolidation instead of a trend. The program then plots 
 EMA, and the lower and upper bounds.
 
 ## Limitations
-The library used for fetching information about stocks and their prices is yFinance. Due to some errors with the yFinance
-servers, exceptions thrown by yFinance cannot be handled in python. In terms of functionality, this means that the user must 
-correctly input the 4 letter ticker for a stock they wish to analyze. Otherwise, an exception will be thrown and the program 
-will terminate. 
+The library used for fetching information about stocks and their prices is yFinance. Entering an invalid Ticker will produce 
+a client error, since yFinance is unable to match the string with any ticker in its databases, and prompt a program
+termination. In this instance, double-check your input and rerun the program. 
 
 ## Notice about Commercial Use:
 Per terms of service of yFinance, any program implementing the library is SOLELY for personal or
