@@ -100,24 +100,20 @@ def find_trend(SMA, EMA, Vol, ticker):
 
 def create_lower_bound(SMA, Vol):
     lower_bound = []
-    for i in SMA:
-        if i != None:
-            lower_bound.append(i - Vol)
+    for s, v in zip(SMA, Vol):
+        if s is not None and v is not None:
+            lower_bound.append(s - v)
         else:
             lower_bound.append(None)
-
-
     return lower_bound
 
 def create_upper_bound(SMA, Vol):
     upper_bound = []
-    for i in SMA:
-        if i != None:
-            upper_bound.append(i + Vol)
+    for s, v in zip(SMA, Vol):
+        if s is not None and v is not None:
+            upper_bound.append(s + v)
         else:
             upper_bound.append(None)
-
-
     return upper_bound
 
 
