@@ -1,7 +1,6 @@
 # TrendFinder
 
 Python program that analyzes trend for a given stock in the NYSE.
-Test 
 
 
 ## Analysis Approach
@@ -20,10 +19,5 @@ EMA, and the lower and upper bounds.
 ## Limitations
 The library used for fetching information about stocks and their prices is yFinance. Entering an invalid Ticker will produce 
 a client error, since yFinance is unable to match the string with any ticker in its databases, and prompt a program
-termination. In this instance, double-check your input and rerun the program. 
-
-## Notice about Commercial Use:
-Per terms of service of yFinance, any program implementing the library is SOLELY for personal or
-educational use, and cannot be used in a commercial context. 
-
+termination. In this instance, double-check your input and rerun the program. yFinance also has rate limitations, and placing too many requests within a short period of time will result in a failed download of stock-data. 
 

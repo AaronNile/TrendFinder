@@ -166,11 +166,16 @@ def main():
     #Compute the moving averages and volatility
     EMA = ExponentialMA(closing_list)
     SMA = simpleMA(closing_list)
-    Vol = Volatility(closing_list) * 2    # annualized volatility × 2 for 2σ bands
+
+
+    Vol = Volatility(closing_list) * 2 
+       # annualized volatility × 2 for 2σ bands
+
+    price_vol = [ (s * Vol) if s is not None else None for s in SMA ]
 
     #Build the upper and lower volatility bands around the SMA
-    lower_bound = create_lower_bound(SMA, Vol)
-    upper_bound = create_upper_bound(SMA, Vol)
+    lower_bound = create_lower_bound(SMA, price_vol)
+    upper_bound = create_upper_bound(SMA, price_vol)
 
     #Analyze the current trend and render the chart
     find_trend(SMA, EMA, Vol, ticker)
